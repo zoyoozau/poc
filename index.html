@@ -62,17 +62,23 @@
   .mini-btn:hover{background:var(--g100);}
   .mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center;}
   .mini-dow{font-size:10px;font-weight:500;color:var(--g600);padding:4px 0;}
-  .mini-cell{display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .mini-cell{display:flex;align-items:center;justify-content:center;}
   .mini-day{
-    width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:12px;color:var(--g700);cursor:pointer;margin:0 auto;transition:.1s;
+    position:relative;
+    width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:12px;color:var(--g700);cursor:pointer;margin:1px auto;transition:.1s;
   }
   .mini-day:hover{background:var(--g100);}
   .mini-day.other{color:var(--g400);}
   .mini-day.today{background:var(--blue);color:#fff;font-weight:600;}
   .mini-day.selected:not(.today){background:var(--blue-lt);color:var(--blue);font-weight:600;}
-  .mini-evt-dot{width:4px;height:4px;border-radius:50%;background:#ef4444;opacity:.85;}
-  .mini-day.other + .mini-evt-dot{opacity:.4;}
+  /* dot อยู่ในวงกลมตัวเลข ชิดขอบล่าง */
+  .mini-day.has-events::after{
+    content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;background:#ef4444;
+  }
+  .mini-day.today.has-events::after{background:rgba(255,255,255,.85);}
+  .mini-day.other.has-events::after{background:#ef9f9f;}
 
   /* people */
   .ppl-title{font-size:13px;font-weight:600;color:var(--g800);margin-bottom:8px;}
@@ -726,12 +732,14 @@ function renderMiniCal(){
     const isT = cur && dt.getTime()===today.getTime();
     const ds  = dStr(dt);
     const hasDot = cur && eventDates.has(ds);
-    const cls = `mini-day${isT?' today':''}${!cur?' other':''}`;
+    const cls = [
+      'mini-day',
+      isT  ? 'today' : '',
+      !cur ? 'other' : '',
+      hasDot ? 'has-events' : ''
+    ].filter(Boolean).join(' ');
     const onclick = cur ? `onclick="jumpDay(${cy},${cm},${d})"` : '';
-    return `<div class="mini-cell">
-      <div class="${cls}" ${onclick}>${d}</div>
-      ${hasDot ? '<div class="mini-evt-dot"></div>' : '<div style="width:4px;height:4px"></div>'}
-    </div>`;
+    return `<div class="mini-cell"><div class="${cls}" ${onclick}>${d}</div></div>`;
   }
 
   let html = '';
