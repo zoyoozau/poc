@@ -62,14 +62,17 @@
   .mini-btn:hover{background:var(--g100);}
   .mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center;}
   .mini-dow{font-size:10px;font-weight:500;color:var(--g600);padding:4px 0;}
+  .mini-cell{display:flex;flex-direction:column;align-items:center;gap:2px;}
   .mini-day{
     width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:12px;color:var(--g700);cursor:pointer;margin:1px auto;transition:.1s;
+    font-size:12px;color:var(--g700);cursor:pointer;margin:0 auto;transition:.1s;
   }
   .mini-day:hover{background:var(--g100);}
   .mini-day.other{color:var(--g400);}
   .mini-day.today{background:var(--blue);color:#fff;font-weight:600;}
   .mini-day.selected:not(.today){background:var(--blue-lt);color:var(--blue);font-weight:600;}
+  .mini-evt-dot{width:4px;height:4px;border-radius:50%;background:#ef4444;opacity:.85;}
+  .mini-day.other + .mini-evt-dot{opacity:.4;}
 
   /* people */
   .ppl-title{font-size:13px;font-weight:600;color:var(--g800);margin-bottom:8px;}
@@ -716,14 +719,27 @@ function renderMiniCal(){
   const prev  = new Date(cy,cm,0).getDate();
   const today = new Date(); today.setHours(0,0,0,0);
 
+  // วันที่มีคนลง (ทั้งเดือน)
+  const eventDates = new Set(evs.map(e=>e.date));
+
+  function miniCell(d, cur, dt){
+    const isT = cur && dt.getTime()===today.getTime();
+    const ds  = dStr(dt);
+    const hasDot = cur && eventDates.has(ds);
+    const cls = `mini-day${isT?' today':''}${!cur?' other':''}`;
+    const onclick = cur ? `onclick="jumpDay(${cy},${cm},${d})"` : '';
+    return `<div class="mini-cell">
+      <div class="${cls}" ${onclick}>${d}</div>
+      ${hasDot ? '<div class="mini-evt-dot"></div>' : '<div style="width:4px;height:4px"></div>'}
+    </div>`;
+  }
+
   let html = '';
   for(let i=first-1;i>=0;i--){
-    html+=`<div class="mini-day other">${prev-i}</div>`;
+    html += miniCell(prev-i, false, new Date(cy,cm-1,prev-i));
   }
   for(let d=1;d<=days;d++){
-    const dt = new Date(cy,cm,d);
-    const isT = dt.getTime()===today.getTime();
-    html+=`<div class="mini-day ${isT?'today':''}" onclick="jumpDay(${cy},${cm},${d})">${d}</div>`;
+    html += miniCell(d, true, new Date(cy,cm,d));
   }
   document.getElementById('miniDays').innerHTML = html;
   document.getElementById('miniDaysD').innerHTML = html;
@@ -789,7 +805,12 @@ function renderGrid(){
 function prevMonth(){ cm--; if(cm<0){cm=11;cy--;} renderAll(); }
 function nextMonth(){ cm++; if(cm>11){cm=0;cy++;} renderAll(); }
 function goToday(){ const n=new Date(); cy=n.getFullYear(); cm=n.getMonth(); renderAll(); }
-function jumpDay(y,m,d){ cy=y; cm=m; renderAll(); openAdd(dStr(new Date(y,m,d))); }
+function jumpDay(y,m,d){
+  cy=y; cm=m; renderAll();
+  dvDate=dStr(new Date(y,m,d));
+  renderDayView();
+  openSheet('dayOvl');
+}
 
 /* ── FILTER ── */
 function setFilter(p){
@@ -895,7 +916,7 @@ function renderDayView(){
     return aR-bR;
   });
   document.getElementById('dvCount').textContent=
-    dayEvs.length ? `${dayEvs.length} คนว่างวันนี้` : 'ยังไม่มีใครลงวันว่าง';
+    dayEvs.length ? `${dayEvs.length} คนว่างวันนี้` : 'ยุ่งกันหมดเลย 😵';
 
   // slot summary
   const sMap={};
@@ -924,7 +945,11 @@ function renderDayView(){
           </div>
         </div>`;
       }).join('')
-    : `<div style="text-align:center;color:var(--g600);font-size:14px;padding:24px 0;">ยังไม่มีใครลงวันว่าง 😴</div>`;
+    : `<div style="text-align:center;padding:28px 0;">
+        <div style="font-size:36px;margin-bottom:8px;">😵</div>
+        <div style="font-size:15px;font-weight:600;color:var(--g800);">ยุ่งกันหมดเลย</div>
+        <div style="font-size:13px;color:var(--g600);margin-top:4px;">ไม่มีใครว่างวันนี้</div>
+       </div>`;
 }
 
 function dvOpenAdd(){
