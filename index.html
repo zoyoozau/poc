@@ -605,10 +605,10 @@ const API = 'https://script.google.com/macros/s/AKfycbyuHp8nxPUixHlQHDe3fqgL7aty
 
 /* ── SLOT META ── */
 const SM = {
-  all:  {label:'ว่างทั้งวัน', em:'🌟'},
-  morn: {label:'ช่วงเช้า',    em:'☀️'},
-  noon: {label:'ช่วงบ่าย',   em:'🌤️'},
-  eve:  {label:'เย็น/คืน',   em:'🌙'},
+  all:  {label:'ว่างทั้งวัน', em:'🌟', color:'#d97706'}, // amber  — ทองสื่อถึงทั้งวัน
+  morn: {label:'ช่วงเช้า',    em:'☀️', color:'#ea580c'}, // orange — แสงเช้า
+  noon: {label:'ช่วงบ่าย',   em:'🌤️', color:'#0284c7'}, // sky    — ฟ้ากลางวัน
+  eve:  {label:'เย็น/คืน',   em:'🌙', color:'#4f46e5'}, // indigo — ท้องฟ้ากลางคืน
 };
 
 /* ── SLOT SORT ORDER ── */
@@ -911,8 +911,8 @@ function renderDayView(){
     ? dayEvs.map(ev=>{
         const c=col(ev.person);
         const tags=(ev.slots||'').split(',').filter(Boolean).map(s=>{
-          const m=SM[s]||{em:'',label:s};
-          return `<span class="dv-stag" style="background:${c}">${m.em} ${m.label}</span>`;
+          const m=SM[s]||{em:'',label:s,color:'#888'};
+          return `<span class="dv-stag" style="background:${m.color}">${m.em} ${m.label}</span>`;
         }).join('');
         return `<div class="dv-person-row">
           <div class="dv-pdot" style="background:${c}"></div>
