@@ -265,6 +265,67 @@
     background:var(--blue-lt);color:var(--blue);
   }
 
+  /* ══ DAY VIEW ══ */
+  .dv-date-badge{
+    display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  }
+  .dv-circle{
+    width:46px;height:46px;border-radius:50%;background:var(--blue);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .dv-circle-d{font-size:18px;font-weight:700;color:#fff;line-height:1;}
+  .dv-circle-m{font-size:9px;font-weight:500;color:rgba(255,255,255,.8);line-height:1.4;text-transform:uppercase;}
+  .dv-date-text{flex:1;}
+  .dv-date-full{font-size:15px;font-weight:600;color:var(--g900);}
+  .dv-count{font-size:12px;color:var(--g600);margin-top:1px;}
+
+  .dv-slots-summary{
+    display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;
+    padding:10px 12px;background:var(--g50);border-radius:10px;
+  }
+  .dv-slot-badge{
+    display:flex;align-items:center;gap:4px;
+    padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;
+    background:var(--sur);border:1px solid var(--g300);color:var(--g700);
+  }
+  .dv-slot-badge.has-people{background:var(--blue-lt);border-color:var(--blue);color:var(--blue);}
+
+  .dv-divider{height:1px;background:var(--g200);margin:12px 0;}
+  .dv-section-title{font-size:11px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+
+  .dv-person-row{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:10px;margin-bottom:4px;
+    background:var(--g50);transition:.1s;
+  }
+  .dv-person-row:last-child{margin-bottom:0;}
+  .dv-pdot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+  .dv-pname{font-size:14px;font-weight:600;color:var(--g900);flex:1;}
+  .dv-pslots{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+  .dv-stag{
+    display:flex;align-items:center;gap:3px;
+    padding:3px 8px;border-radius:12px;font-size:11px;font-weight:500;
+    color:#fff;
+  }
+  .dv-actions{display:flex;gap:2px;flex-shrink:0;}
+  .dv-act-btn{
+    width:30px;height:30px;border-radius:8px;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:14px;
+    background:transparent;color:var(--g600);transition:.1s;
+  }
+  .dv-act-btn:hover{background:var(--g200);}
+  .dv-act-btn.del:hover{background:#fce8e6;color:#c5221f;}
+
+  .dv-add-btn{
+    width:100%;margin-top:14px;padding:12px;border-radius:10px;
+    border:1.5px dashed var(--blue);background:transparent;
+    color:var(--blue);font-family:var(--font);font-size:14px;font-weight:600;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:.15s;
+  }
+  .dv-add-btn:hover{background:var(--blue-lt);}
+
   /* ══ TOAST ══ */
   .toast{
     position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(12px);
@@ -431,26 +492,18 @@
       </div>
       <div class="frow">
         <label class="flabel">ว่างช่วงไหน?</label>
-        <div class="slot-grid">
+        <div class="slot-grid" id="fSlotGrid">
           <button class="slot-btn" data-s="all" onclick="pickSlot(this)">
-            <span class="slot-em">🌟</span>
-            <span class="slot-nm">ว่างทั้งวัน</span>
-            <span class="slot-tm">ตลอดวัน</span>
+            <span class="slot-em">🌟</span><span class="slot-nm">ว่างทั้งวัน</span><span class="slot-tm"></span>
           </button>
           <button class="slot-btn" data-s="morn" onclick="pickSlot(this)">
-            <span class="slot-em">☀️</span>
-            <span class="slot-nm">ช่วงเช้า</span>
-            <span class="slot-tm">06:00 – 12:00</span>
+            <span class="slot-em">☀️</span><span class="slot-nm">ช่วงเช้า</span><span class="slot-tm"></span>
           </button>
           <button class="slot-btn" data-s="noon" onclick="pickSlot(this)">
-            <span class="slot-em">🌤️</span>
-            <span class="slot-nm">ช่วงบ่าย</span>
-            <span class="slot-tm">12:00 – 18:00</span>
+            <span class="slot-em">🌤️</span><span class="slot-nm">ช่วงบ่าย</span><span class="slot-tm"></span>
           </button>
           <button class="slot-btn" data-s="eve" onclick="pickSlot(this)">
-            <span class="slot-em">🌙</span>
-            <span class="slot-nm">เย็น / คืน</span>
-            <span class="slot-tm">18:00 – 24:00</span>
+            <span class="slot-em">🌙</span><span class="slot-nm">เย็น / คืน</span><span class="slot-tm"></span>
           </button>
         </div>
       </div>
@@ -462,24 +515,82 @@
   </div>
 </div>
 
-<!-- DETAIL OVERLAY -->
+<!-- DAY VIEW OVERLAY -->
+<div class="ovl" id="dayOvl" onclick="bgClick(event,'dayOvl')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-hdr">
+      <div class="sheet-title">ใครว่างวันนี้?</div>
+      <button class="iBtn" onclick="closeSheet('dayOvl')">✕</button>
+    </div>
+    <div class="sheet-body">
+      <!-- date badge -->
+      <div class="dv-date-badge">
+        <div class="dv-circle">
+          <div class="dv-circle-d" id="dvDay"></div>
+          <div class="dv-circle-m" id="dvMon"></div>
+        </div>
+        <div class="dv-date-text">
+          <div class="dv-date-full" id="dvDateFull"></div>
+          <div class="dv-count" id="dvCount"></div>
+        </div>
+      </div>
+      <!-- slot summary bar -->
+      <div class="dv-slots-summary" id="dvSummary"></div>
+      <!-- people list -->
+      <div class="dv-section-title">รายชื่อ</div>
+      <div id="dvList"></div>
+      <!-- add button -->
+      <button class="dv-add-btn" id="dvAddBtn" onclick="dvOpenAdd()">
+        <span>＋</span> ลงวันว่างของฉัน
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT OVERLAY (single person, kept for edit flow) -->
 <div class="ovl" id="detOvl" onclick="bgClick(event,'detOvl')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
-      <div class="sheet-title">รายละเอียด</div>
+      <div class="sheet-title" id="detTitle">แก้ไข</div>
       <button class="iBtn" onclick="closeSheet('detOvl')">✕</button>
     </div>
     <div class="sheet-body">
-      <div class="det-person">
-        <div class="det-dot" id="detDot"></div>
-        <div class="det-name" id="detName"></div>
+      <div class="frow">
+        <label class="flabel">ชื่อ</label>
+        <div class="ac-wrap">
+          <input class="finput" id="ePerson" type="text" autocomplete="off"
+            onfocus="acShowEl('ePerson','acDropE')"
+            oninput="acFilterEl('ePerson','acDropE')"
+            onblur="setTimeout(()=>acHideEl('acDropE'),180)" />
+          <div class="ac-drop" id="acDropE"></div>
+        </div>
       </div>
-      <div class="det-date" id="detDate"></div>
-      <div class="slot-tags" id="detSlots"></div>
-      <div class="btn-row" style="margin-top:20px;">
+      <div class="frow">
+        <label class="flabel">วันที่</label>
+        <input class="finput" id="eDate" type="date" />
+      </div>
+      <div class="frow">
+        <label class="flabel">ว่างช่วงไหน?</label>
+        <div class="slot-grid" id="eSlotGrid">
+          <button class="slot-btn" data-s="all" onclick="pickSlotEl(this,'eSlotGrid')">
+            <span class="slot-em">🌟</span><span class="slot-nm">ว่างทั้งวัน</span><span class="slot-tm"></span>
+          </button>
+          <button class="slot-btn" data-s="morn" onclick="pickSlotEl(this,'eSlotGrid')">
+            <span class="slot-em">☀️</span><span class="slot-nm">ช่วงเช้า</span><span class="slot-tm"></span>
+          </button>
+          <button class="slot-btn" data-s="noon" onclick="pickSlotEl(this,'eSlotGrid')">
+            <span class="slot-em">🌤️</span><span class="slot-nm">ช่วงบ่าย</span><span class="slot-tm"></span>
+          </button>
+          <button class="slot-btn" data-s="eve" onclick="pickSlotEl(this,'eSlotGrid')">
+            <span class="slot-em">🌙</span><span class="slot-nm">เย็น / คืน</span><span class="slot-tm"></span>
+          </button>
+        </div>
+      </div>
+      <div class="btn-row">
         <button class="btn-del" id="btnDel" onclick="doDelete()">🗑 ลบ</button>
-        <button class="btn-main" onclick="openEdit()">✏️ แก้ไข</button>
+        <button class="btn-main" id="btnEdit" onclick="doEdit()">💾 บันทึก</button>
       </div>
     </div>
   </div>
@@ -658,12 +769,14 @@ function renderGrid(){
       const c = col(ev.person);
       const slots = (ev.slots||'').split(',').filter(Boolean);
       const ems = slots.map(s=>SM[s]?.em||'').join('');
-      return `<div class="ev-chip" style="background:${c}" onclick="openDetail(event,'${ev.row}')">
+      return `<div class="ev-chip" style="background:${c}" onclick="openDayView(event,'${ds}')">
         <span class="ev-chip-name">${esc(ev.person)}</span>
         <span class="ev-chip-slots">${ems}</span>
       </div>`;
     }).join('');
-    const more = list.length>3?`<div class="ev-more">+${list.length-3}</div>`:'';
+    const more = list.length>3
+      ? `<div class="ev-more" onclick="openDayView(event,'${ds}')">+${list.length-3} คน</div>`
+      : '';
 
     return `<div class="cell ${cell.cur?'':'dim'} ${isT?'is-today':''}" onclick="cellClick('${ds}')">
       <div class="daynum">${cell.d}</div>
@@ -692,36 +805,26 @@ function openAdd(ds){
   document.getElementById('addTitle').textContent='ลงวันว่าง 📅';
   document.getElementById('fPerson').value = localStorage.getItem('lastPerson')||'';
   document.getElementById('fDate').value = ds||dStr(new Date());
-  document.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#fSlotGrid .slot-btn').forEach(b=>b.classList.remove('on'));
   const btn = document.getElementById('btnSave');
   btn.disabled=false; btn.textContent='💾 บันทึก';
   openSheet('addOvl');
   setTimeout(()=>document.getElementById('fPerson').focus(),300);
 }
 
-function openEdit(){
-  if(!detEv) return;
-  closeSheet('detOvl');
-  editRow=detEv.row;
-  document.getElementById('addTitle').textContent='✏️ แก้ไข';
-  document.getElementById('fPerson').value=detEv.person||'';
-  document.getElementById('fDate').value=detEv.date||'';
-  const slots=(detEv.slots||'').split(',').filter(Boolean);
-  document.querySelectorAll('.slot-btn').forEach(b=>b.classList.toggle('on',slots.includes(b.dataset.s)));
-  const btn=document.getElementById('btnSave');
-  btn.disabled=false; btn.textContent='💾 บันทึก';
-  openSheet('addOvl');
-}
-
 /* ── SLOT TOGGLE ── */
 function pickSlot(btn){
+  pickSlotEl(btn,'fSlotGrid');
+}
+function pickSlotEl(btn,gridId){
   const s=btn.dataset.s;
+  const grid=document.getElementById(gridId);
   if(s==='all'){
     const was=btn.classList.contains('on');
-    document.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('on'));
+    grid.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('on'));
     if(!was) btn.classList.add('on');
   } else {
-    document.querySelector('[data-s="all"]').classList.remove('on');
+    grid.querySelector('[data-s="all"]').classList.remove('on');
     btn.classList.toggle('on');
   }
 }
@@ -730,7 +833,7 @@ function pickSlot(btn){
 async function doSave(){
   const person = document.getElementById('fPerson').value.trim();
   const date   = document.getElementById('fDate').value;
-  const slots  = [...document.querySelectorAll('.slot-btn.on')].map(b=>b.dataset.s).join(',');
+  const slots  = [...document.querySelectorAll('#fSlotGrid .slot-btn.on')].map(b=>b.dataset.s).join(',');
 
   if(!person){ toast('กรุณาใส่ชื่อ ✏️'); return; }
   if(!date)  { toast('กรุณาเลือกวันที่ 📅'); return; }
@@ -768,23 +871,104 @@ async function doSave(){
   btn.disabled=false; btn.textContent='💾 บันทึก';
 }
 
-/* ── DETAIL ── */
-function openDetail(ev,rowStr){
-  ev.stopPropagation();
+/* ── DAY VIEW ── */
+let dvDate=null;
+
+function openDayView(e,ds){
+  e.stopPropagation();
+  dvDate=ds;
+  renderDayView();
+  openSheet('dayOvl');
+}
+
+function renderDayView(){
+  if(!dvDate) return;
+  const dt=new Date(dvDate+'T00:00:00');
+  document.getElementById('dvDay').textContent=dt.getDate();
+  document.getElementById('dvMon').textContent=dt.toLocaleDateString('th-TH',{month:'short'});
+  document.getElementById('dvDateFull').textContent=fmtDate(dvDate);
+
+  // all events for this date (no filter) sorted by slot priority
+  const dayEvs=evs.filter(e=>e.date===dvDate).sort((a,b)=>{
+    const aR=Math.min(...(((a.slots||'').split(',').filter(Boolean).map(s=>{const i=SLOT_ORDER.indexOf(s);return i<0?99:i;})||[99])));
+    const bR=Math.min(...(((b.slots||'').split(',').filter(Boolean).map(s=>{const i=SLOT_ORDER.indexOf(s);return i<0?99:i;})||[99])));
+    return aR-bR;
+  });
+  document.getElementById('dvCount').textContent=
+    dayEvs.length ? `${dayEvs.length} คนว่างวันนี้` : 'ยังไม่มีใครลงวันว่าง';
+
+  // slot summary
+  const sMap={};
+  SLOT_ORDER.forEach(s=>sMap[s]=[]);
+  dayEvs.forEach(ev=>(ev.slots||'').split(',').filter(Boolean).forEach(s=>{ if(sMap[s]) sMap[s].push(ev.person); }));
+  document.getElementById('dvSummary').innerHTML=SLOT_ORDER.map(s=>{
+    const m=SM[s]; const n=sMap[s].length;
+    return `<div class="dv-slot-badge ${n?'has-people':''}">${m.em} ${m.label}${n?` · ${n}`:''}</div>`;
+  }).join('');
+
+  // person rows
+  document.getElementById('dvList').innerHTML=dayEvs.length
+    ? dayEvs.map(ev=>{
+        const c=col(ev.person);
+        const tags=(ev.slots||'').split(',').filter(Boolean).map(s=>{
+          const m=SM[s]||{em:'',label:s};
+          return `<span class="dv-stag" style="background:${c}">${m.em} ${m.label}</span>`;
+        }).join('');
+        return `<div class="dv-person-row">
+          <div class="dv-pdot" style="background:${c}"></div>
+          <div class="dv-pname">${esc(ev.person)}</div>
+          <div class="dv-pslots">${tags}</div>
+          <div class="dv-actions">
+            <button class="dv-act-btn" onclick="openEditFromDay('${ev.row}')" title="แก้ไข">✏️</button>
+            <button class="dv-act-btn del" onclick="deleteFromDay('${ev.row}')" title="ลบ">🗑</button>
+          </div>
+        </div>`;
+      }).join('')
+    : `<div style="text-align:center;color:var(--g600);font-size:14px;padding:24px 0;">ยังไม่มีใครลงวันว่าง 😴</div>`;
+}
+
+function dvOpenAdd(){
+  closeSheet('dayOvl');
+  openAdd(dvDate);
+}
+
+/* ── EDIT FROM DAY VIEW ── */
+function openEditFromDay(rowStr){
   detEv=evs.find(e=>String(e.row)===String(rowStr));
   if(!detEv) return;
-  const c=col(detEv.person);
-  document.getElementById('detDot').style.background=c;
-  document.getElementById('detName').textContent=detEv.person;
-  document.getElementById('detDate').textContent=fmtDate(detEv.date);
+  document.getElementById('ePerson').value=detEv.person||'';
+  document.getElementById('eDate').value=detEv.date||'';
   const slots=(detEv.slots||'').split(',').filter(Boolean);
-  document.getElementById('detSlots').innerHTML=slots.map(s=>{
-    const m=SM[s]||{label:s,em:''};
-    return `<div class="stag">${m.em} ${m.label}</div>`;
-  }).join('')||'<span style="color:var(--g600);font-size:13px;">ไม่ได้ระบุ</span>';
-  const db=document.getElementById('btnDel');
-  db.disabled=false; db.textContent='🗑 ลบ';
+  document.querySelectorAll('#eSlotGrid .slot-btn').forEach(b=>b.classList.toggle('on',slots.includes(b.dataset.s)));
+  document.getElementById('btnEdit').disabled=false;
+  document.getElementById('btnEdit').textContent='💾 บันทึก';
+  document.getElementById('btnDel').disabled=false;
+  document.getElementById('btnDel').textContent='🗑 ลบ';
   openSheet('detOvl');
+}
+
+async function doEdit(){
+  if(!detEv) return;
+  const person=document.getElementById('ePerson').value.trim();
+  const date=document.getElementById('eDate').value;
+  const slots=[...document.querySelectorAll('#eSlotGrid .slot-btn.on')].map(b=>b.dataset.s).join(',');
+  if(!person){ toast('กรุณาใส่ชื่อ ✏️'); return; }
+  if(!slots){ toast('เลือกช่วงเวลาที่ว่างด้วยนะ 🕐'); return; }
+  const btn=document.getElementById('btnEdit');
+  btn.disabled=true; btn.textContent='กำลังบันทึก...';
+  const rowToEdit=detEv.row;
+  const payload={person,date,slots};
+  const idx=evs.findIndex(e=>String(e.row)===String(rowToEdit));
+  const bak=idx>=0?{...evs[idx]}:null;
+  if(idx>=0) evs[idx]={...evs[idx],...payload};
+  closeSheet('detOvl');
+  renderDayView(); renderAll();
+  try{ await post({action:'update',row:rowToEdit,...payload}); }
+  catch(e){
+    if(bak&&idx>=0) evs[idx]=bak;
+    renderDayView(); renderAll(); toast('แก้ไขไม่สำเร็จ: '+e.message);
+  }
+  btn.disabled=false; btn.textContent='💾 บันทึก';
 }
 
 /* ── DELETE ── */
@@ -792,12 +976,21 @@ async function doDelete(){
   if(!detEv) return;
   const db=document.getElementById('btnDel');
   db.disabled=true; db.textContent='กำลังลบ...';
-  const rowDel=detEv.row;
-  const bak=[...evs];
+  const rowDel=detEv.row; const bak=[...evs];
   evs=evs.filter(e=>String(e.row)!==String(rowDel));
-  closeSheet('detOvl'); renderAll();
+  closeSheet('detOvl'); renderDayView(); renderAll();
   try{ await post({action:'delete',row:rowDel}); }
-  catch(e){ evs=bak; renderAll(); toast('ลบไม่สำเร็จ: '+e.message); }
+  catch(e){ evs=bak; renderDayView(); renderAll(); toast('ลบไม่สำเร็จ: '+e.message); }
+}
+
+async function deleteFromDay(rowStr){
+  const ev=evs.find(e=>String(e.row)===String(rowStr));
+  if(!ev) return;
+  const bak=[...evs];
+  evs=evs.filter(e=>String(e.row)!==String(rowStr));
+  renderDayView(); renderAll();
+  try{ await post({action:'delete',row:rowStr}); }
+  catch(e){ evs=bak; renderDayView(); renderAll(); toast('ลบไม่สำเร็จ: '+e.message); }
 }
 
 /* ── API ── */
@@ -844,33 +1037,32 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function people_sorted(){ return [...new Set(evs.map(e=>e.person).filter(Boolean))].sort(); }
 
 /* ── AUTOCOMPLETE ── */
-function acShow(){
-  const q = document.getElementById('fPerson').value.trim().toLowerCase();
-  acRender(q);
+function acShow(){ acShowEl('fPerson','acDrop'); }
+function acFilter(){ acFilterEl('fPerson','acDrop'); }
+function acHide(){ acHideEl('acDrop'); }
+
+function acShowEl(inputId,dropId){
+  acRenderEl(document.getElementById(inputId).value.trim().toLowerCase(),dropId,inputId);
 }
-function acFilter(){
-  const q = document.getElementById('fPerson').value.trim().toLowerCase();
-  acRender(q);
+function acFilterEl(inputId,dropId){
+  acRenderEl(document.getElementById(inputId).value.trim().toLowerCase(),dropId,inputId);
 }
-function acRender(q){
-  const drop = document.getElementById('acDrop');
-  const all  = people_sorted();
-  const list = q ? all.filter(p => p.toLowerCase().includes(q)) : all;
+function acHideEl(dropId){ document.getElementById(dropId).classList.remove('show'); }
+function acRenderEl(q,dropId,inputId){
+  const drop=document.getElementById(dropId);
+  const all=people_sorted();
+  const list=q?all.filter(p=>p.toLowerCase().includes(q)):all;
   if(!list.length){ drop.classList.remove('show'); return; }
-  drop.innerHTML = list.map(p => {
-    const c = col(p);
-    return `<div class="ac-item" onmousedown="acPick('${esc(p)}')">
-      <span class="ac-dot" style="background:${c}"></span>${esc(p)}
-    </div>`;
+  drop.innerHTML=list.map(p=>{
+    const c=col(p);
+    return `<div class="ac-item" onmousedown="acPickEl('${esc(p)}','${inputId}','${dropId}')">
+      <span class="ac-dot" style="background:${c}"></span>${esc(p)}</div>`;
   }).join('');
   drop.classList.add('show');
 }
-function acPick(name){
-  document.getElementById('fPerson').value = name;
-  document.getElementById('acDrop').classList.remove('show');
-}
-function acHide(){
-  document.getElementById('acDrop').classList.remove('show');
+function acPickEl(name,inputId,dropId){
+  document.getElementById(inputId).value=name;
+  document.getElementById(dropId).classList.remove('show');
 }
 </script>
 </body>
