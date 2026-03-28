@@ -6,7 +6,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>ว่างไหม?</title>
+  <title>หาวันว่างร่วมกัน</title>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -291,7 +291,7 @@
 <div class="app">
 <div class="hdr">
   <button class="iBtn" onclick="toggleDrawer()">☰</button>
-  <div class="hdr-title">ว่าง<b>ไหม?</b></div>
+  <div class="hdr-title">หาวันว่าง<b>ร่วมกัน</b></div>
   <button class="btn-today" onclick="goToday()">วันนี้</button>
   <button class="iBtn" onclick="syncData(true)" title="รีเฟรช">↻</button>
 </div>
@@ -360,7 +360,7 @@
   <div class="sidebar-drawer" onclick="event.stopPropagation()">
     <div class="drawer-close">
       <button class="iBtn" onclick="closeDrawer()">✕</button>
-      <div class="drawer-close-title">ว่าง<b style="color:var(--blue)">ไหม?</b></div>
+      <div class="drawer-close-title">หาวันว่าง<b style="color:var(--blue)">ร่วมกัน</b></div>
     </div>
     <!-- mini calendar (drawer) -->
     <div class="mini-cal">
@@ -476,6 +476,9 @@ const SM = {
   noon: {label:'ช่วงบ่าย',   em:'🌤️'},
   eve:  {label:'เย็น/คืน',   em:'🌙'},
 };
+
+/* ── SLOT SORT ORDER ── */
+const SLOT_ORDER = ['all','morn','noon','eve']; // ลำดับความสำคัญ: ทั้งวัน → เช้า → บ่าย → เย็น
 
 /* ── PALETTE ── */
 const PAL = ['#1a73e8','#0f9d58','#9334e9','#fa7b17','#d93025','#00796b','#3949ab','#e91e63','#0097a7','#827717'];
@@ -619,7 +622,14 @@ function renderGrid(){
   grid.innerHTML = cells.map(cell=>{
     const ds = dStr(cell.dt);
     const isT = cell.cur && cell.dt.getTime()===today.getTime();
-    const list = byDate[ds]||[];
+    // เรียงตาม slot priority: ทั้งวัน → เช้า → บ่าย → เย็น/คืน
+    const list = (byDate[ds]||[]).slice().sort((a,b)=>{
+      const aSlots = (a.slots||'').split(',').filter(Boolean);
+      const bSlots = (b.slots||'').split(',').filter(Boolean);
+      const aRank = aSlots.length ? Math.min(...aSlots.map(s=>{ const i=SLOT_ORDER.indexOf(s); return i<0?99:i; })) : 99;
+      const bRank = bSlots.length ? Math.min(...bSlots.map(s=>{ const i=SLOT_ORDER.indexOf(s); return i<0?99:i; })) : 99;
+      return aRank - bRank;
+    });
 
     const chips = list.slice(0,3).map(ev=>{
       const c = col(ev.person);
