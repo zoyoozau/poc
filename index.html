@@ -23,7 +23,7 @@
   /* ══ LAYOUT ══ */
   .app{display:flex;flex-direction:column;height:100%;}
   .app-main{flex:1;display:flex;overflow:hidden;}
-  .cal-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .cal-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
 
   /* ══ HEADER ══ */
   .hdr{
@@ -349,6 +349,23 @@
   /* ══ LOAD BAR ══ */
   .lbar{position:fixed;top:0;left:0;height:3px;background:var(--blue);width:0;z-index:999;transition:.4s;}
 
+  /* ══ SPINNER ══ */
+  .spinner-wrap{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:14px;
+    background:rgba(255,255,255,.75);backdrop-filter:blur(2px);
+    z-index:100;opacity:0;pointer-events:none;transition:opacity .25s;
+  }
+  .spinner-wrap.show{opacity:1;pointer-events:all;}
+  .spinner{
+    width:40px;height:40px;border-radius:50%;
+    border:3px solid var(--g200);
+    border-top-color:var(--blue);
+    animation:spin .75s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .spinner-txt{font-size:13px;color:var(--g600);font-weight:500;}
+
   /* ══ RESPONSIVE ══ */
   @media(min-width:700px){
     .sidebar{display:flex;}
@@ -423,6 +440,12 @@
       <button class="iBtn" onclick="prevMonth()">‹</button>
       <div class="month-lbl" id="monthLbl"></div>
       <button class="iBtn" onclick="nextMonth()">›</button>
+    </div>
+
+    <!-- spinner overlay -->
+    <div class="spinner-wrap" id="spinnerWrap">
+      <div class="spinner"></div>
+      <div class="spinner-txt">กำลังโหลด...</div>
     </div>
 
     <!-- calendar -->
@@ -673,8 +696,10 @@ async function fetchAll(){
 /* ── LOADING ── */
 function setLoad(on){
   const b = document.getElementById('lbar');
+  const s = document.getElementById('spinnerWrap');
   b.style.width = on ? '75%' : '100%';
-  if(!on) setTimeout(()=>{ b.style.width='0'; }, 500);
+  if(on){ s.classList.add('show'); }
+  else  { setTimeout(()=>{ b.style.width='0'; s.classList.remove('show'); }, 400); }
 }
 
 /* ── RENDER ── */
